@@ -1,0 +1,195 @@
+
+<!DOCTYPE HTML><html>
+<!-- Tran Tuan Diep _ HUST_VN
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files.
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software. -->
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="https://code.highcharts.com/highcharts.js"></script>
+  <style>
+    body {
+      min-width: 310px;
+    	max-width: 800px;
+    	height: 400px;
+      margin: 0 auto;
+      text-align: center;
+    }
+    h1 {    
+      background-color: #32F497;
+      width: auto;
+      height: auto;
+      margin: 0 auto;
+      font-family: Arial;
+      font-size: 2.5rem;
+      text-align: center;
+    }
+    h2 {
+      background-color: #F43297;
+      width: auto;
+      height: auto;
+      margin: 0 auto;
+      font-family: Arial;
+      font-size: 2.5rem;
+      text-align: center;
+    }
+    p {
+      font-size: 1.5rem;
+    }
+    .button1 {
+      display: inline-block;
+      background-color: #008CBA; 
+      border: none;
+      border-radius: 4px;
+      color: white;
+      padding: 16px 40px;
+      text-decoration: none;
+      font-size: 30px;
+      margin: 2px;
+      cursor: pointer;
+    }
+    .button2 {
+      display: inline-block;
+      background-color: #f44336; 
+      border: none;
+      border-radius: 4px;
+      color: white;
+      padding: 16px 40px;
+      text-decoration: none;
+      font-size: 30px;
+      margin: 2px;
+      cursor: pointer;
+    }
+    .button3 {
+      display: inline-block;
+      background-color: #36e7f4; 
+      border: none;
+      border-radius: 4px;
+      color: white;
+      padding: 16px 40px;
+      text-decoration: none;
+      font-size: 30px;
+      margin: 2px;
+      cursor: pointer;
+    }
+    .button4 {
+      display: inline-block;
+      background-color: #36f432;   
+      border: none;
+      border-radius: 4px;
+      color: white;
+      padding: 16px 40px;
+      text-decoration: none;
+      font-size: 30px;
+      margin: 2px;
+      cursor: pointer;
+    }
+    h3 {
+      background-color: #9732F4;
+      width: auto;
+      height: auto;
+      margin: 0 auto;
+      font-family: Arial;
+      font-size: 2.5rem;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <h1>ESP Weather Station</h1>
+  <div id="chart-temperature" class="container"></div>
+  <div id="chart-humidity" class="container"></div>
+  
+  <h2>BUTTON CONTROL OLED 1.3IN (I2C)</h2>
+  <!--<p>FRAME STATE : <strong> %STATE%</strong></p>-->
+  <p><a href="/4"><button class="button2">HOMESCREEN</button></a></p>
+  <p><a href="/5"><button class="button3">MENU</button></a></p>
+  <p><a href="/6"><button class="button4">WEATHER</button></a></p>
+  <p><a href="/1"><button class="button1">LOCKSCREEN</button></a></p>
+  
+  <h3><p> © By Tran Tuan Diep. All right reserved</p></h3>
+  
+</body>
+<script>
+var chartT = new Highcharts.Chart({
+  chart:{ renderTo : 'chart-temperature' },
+  title: { text: 'DHT11 Temperature' },
+  series: [{
+    showInLegend: false,
+    data: []
+  }],
+  plotOptions: {
+    line: { animation: false,
+      dataLabels: { enabled: true }
+    },
+    series: { color: '#059e8a' }
+  },
+  xAxis: { type: 'datetime',
+    dateTimeLabelFormats: { second: '%H:%M:%S' }
+  },
+  yAxis: {
+    title: { text: 'Temperature (Celsius)' }
+    //title: { text: 'Temperature (Fahrenheit)' }
+  },
+  credits: { enabled: false }
+});
+setInterval(function ( ) {
+  var xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+      var x = (new Date()).getTime() + 1000 * 60 * 60 * 7,
+          y = parseFloat(this.responseText);
+      //console.log(this.responseText);
+      if(chartT.series[0].data.length > 40) {
+        chartT.series[0].addPoint([x, y], true, true, true);
+      } else {
+        chartT.series[0].addPoint([x, y], true, false, true);
+      }
+    }
+  };
+  xhttp.open("GET", "/temperature", true);
+  xhttp.send();
+}, 30000 ) ;
+
+var chartH = new Highcharts.Chart({
+  chart:{ renderTo:'chart-humidity' },
+  title: { text: 'DHT11 Humidity' },
+  series: [{
+    showInLegend: false,
+    data: []
+  }],
+  plotOptions: {
+    line: { animation: false,
+      dataLabels: { enabled: true }
+    }
+  },
+  xAxis: {
+    type: 'datetime',
+    dateTimeLabelFormats: { second: '%H:%M:%S' }
+  },
+  yAxis: {
+    title: { text: 'Humidity (%)' }
+  },
+  credits: { enabled: false }
+});
+setInterval(function ( ) {
+  var xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+      var x = (new Date()).getTime() + 1000 * 60 * 60 * 7,
+          y = parseFloat(this.responseText);
+      //console.log(this.responseText);
+      if(chartH.series[0].data.length > 40) {
+        chartH.series[0].addPoint([x, y], true, true, true);
+      } else {
+        chartH.series[0].addPoint([x, y], true, false, true);
+      }
+    }
+  };
+  xhttp.open("GET", "/humidity", true);
+  xhttp.send();
+}, 30000 ) ;
+</script>
+</html>
